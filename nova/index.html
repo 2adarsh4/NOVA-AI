@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>NOVA AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#080b12;color:#fff;height:100vh}
+.app{max-width:700px;margin:auto;height:100vh;display:flex;flex-direction:column}
+header{padding:22px;text-align:center;border-bottom:1px solid #252b38}
+.logo{font-size:32px;font-weight:bold;letter-spacing:4px}
+.sub{color:#8d96a8;margin-top:5px}
+.chat{flex:1;padding:20px;overflow:auto}
+.message{padding:14px 16px;border-radius:16px;margin-bottom:14px;max-width:85%;line-height:1.5}
+.nova{background:#151b27;border:1px solid #293142}
+.user{background:#243047;margin-left:auto}
+.bottom{padding:15px;border-top:1px solid #252b38}
+input{width:100%;padding:16px;border-radius:14px;border:1px solid #343d4d;background:#111722;color:white;font-size:16px}
+.buttons{display:flex;gap:8px;margin-top:10px}
+button{flex:1;padding:12px;border:0;border-radius:12px;background:#20293a;color:white}
+button:hover{background:#303b50}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div class="logo">NOVA</div>
+<div class="sub">Your Personal AI Assistant</div>
+</header>
+
+<div class="chat" id="chat">
+<div class="message nova">Hello! I'm NOVA. 👋<br>I'm ready to become your personal AI assistant.</div>
+</div>
+
+<div class="bottom">
+<input id="input" placeholder="Ask NOVA anything..." onkeydown="if(event.key==='Enter')send()">
+<div class="buttons">
+<button onclick="send()">Send</button>
+<button onclick="speak()">🎤 Voice</button>
+</div>
+</div>
+</div>
+
+<script>
+function send(){
+ const input=document.getElementById('input');
+ const text=input.value.trim();
+ if(!text)return;
+ const chat=document.getElementById('chat');
+ chat.innerHTML+=`<div class="message user">${text}</div>`;
+ input.value='';
+ setTimeout(()=>{
+  chat.innerHTML+=`<div class="message nova">I received your message. My AI brain will be connected next. 🧠</div>`;
+  chat.scrollTop=chat.scrollHeight;
+ },400);
+ chat.scrollTop=chat.scrollHeight;
+}
+function speak(){
+ if('speechSynthesis' in window){
+  const u=new SpeechSynthesisUtterance("Hello, I am NOVA.");
+  speechSynthesis.speak(u);
+ }
+}
+</script>
+</body>
+</html>
