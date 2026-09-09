@@ -1,4 +1,4 @@
-const replyText = 'I received your message. My AI brain will be connected next. 🧠';
+import { generateNOVAResponse } from './brain.js';
 
 /**
  * Connect the NOVA controls once their DOM elements are available.
@@ -8,6 +8,7 @@ const replyText = 'I received your message. My AI brain will be connected next. 
  * fail merely because the document is still being parsed.
  */
 export function initializeNOVA(document, window) {
+  const { generateResponse = generateNOVAResponse } = arguments[2] ?? {};
   const chat = document.getElementById('chat');
   const form = document.getElementById('chat-form');
   const input = document.getElementById('input');
@@ -21,16 +22,37 @@ export function initializeNOVA(document, window) {
     message.textContent = text;
     chat.appendChild(message);
     chat.scrollTop = chat.scrollHeight;
+    return message;
   };
 
-  const send = () => {
+  const setSending = (sending) => {
+    input.disabled = sending;
+    const sendButton = form.querySelector?.('button[type="submit"]');
+    if (sendButton) sendButton.disabled = sending;
+  };
+
+  const send = async () => {
     const text = input.value.trim();
     if (!text) return;
 
     appendMessage('user', text);
     input.value = '';
-    input.focus();
-    window.setTimeout(() => appendMessage('nova', replyText), 400);
+    setSending(true);
+
+    let thinkingMessage;
+    try {
+      thinkingMessage = appendMessage('nova', 'NOVA is thinking…');
+      const response = await generateResponse(text);
+      thinkingMessage.textContent = response;
+    } catch (error) {
+      console.error('Unable to generate a NOVA response.', error);
+      const message = 'I could not load my local AI brain. Please make sure the SmolLM2 model files are available and try again.';
+      if (thinkingMessage?.classList?.contains('nova')) thinkingMessage.textContent = message;
+      else appendMessage('nova', message);
+    } finally {
+      setSending(false);
+      input.focus();
+    }
   };
 
   const speak = () => {
@@ -55,7 +77,7 @@ export function initializeNOVA(document, window) {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    send();
+    void send();
   });
   voiceButton.addEventListener('click', speak);
   return true;
