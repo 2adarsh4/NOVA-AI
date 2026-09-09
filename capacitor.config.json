@@ -1,0 +1,6 @@
+{
+  "appId": "ai.jarvis.nova",
+  "appName": "JARVIS AI",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

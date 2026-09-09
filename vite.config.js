@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  // The existing application is intentionally kept in its original directory.
+  // Keep the established browser application directory for compatibility.
   root: 'nova',
   build: {
     outDir: '../dist',

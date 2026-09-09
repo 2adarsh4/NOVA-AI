@@ -8,13 +8,13 @@ const brain = await readFile(new URL('../nova/brain.js', import.meta.url), 'utf8
 const { initializeNOVA, openSupportedApp } = await import('../nova/main.js');
 const { generateNOVAResponse, resetNOVAForTests } = await import('../nova/brain.js');
 
-test('the Vite HTML entry loads the NOVA module entry point', () => {
+test('the Vite HTML entry loads the JARVIS module entry point', () => {
   assert.match(html, /<script type="module" src="\/main\.js"><\/script>/);
   assert.match(app, /export function initializeNOVA\(document, window\)/);
 });
 
-test('NOVA has the DOM hooks required during startup', () => {
-  for (const id of ['chat', 'chat-form', 'input', 'voice-button']) {
+test('JARVIS has the DOM hooks required during startup', () => {
+  for (const id of ['chat', 'chat-form', 'input', 'voice-button', 'wake-word-button']) {
     assert.match(html, new RegExp(`id="${id}"`));
   }
 });
@@ -24,7 +24,7 @@ test('messages are rendered as text rather than injected HTML', () => {
   assert.doesNotMatch(app, /message\.innerHTML\s*=/);
 });
 
-test('NOVA connects to the local SmolLM2 ONNX model through Transformers.js', () => {
+test('JARVIS connects to the local SmolLM2 ONNX model through Transformers.js', () => {
   assert.match(brain, /@huggingface\/transformers@4\.2\.0/);
   assert.match(brain, /onnx-community\/SmolLM2-135M-Instruct-ONNX/);
   assert.match(brain, /env\.allowRemoteModels = true/);
@@ -67,7 +67,7 @@ test('the brain applies SmolLM2 chat decoding controls and returns only its gene
     [
       {
         role: 'system',
-        content: 'You are NOVA, a helpful, concise personal AI assistant. Answer the user directly and accurately in one short sentence or phrase, then stop. For arithmetic, return the exact result and nothing else. Do not repeat yourself or claim capabilities you do not have.',
+        content: 'You are JARVIS, a helpful, concise personal AI assistant. Answer the user directly and accurately in one short sentence or phrase, then stop. For arithmetic, return the exact result and nothing else. Do not repeat yourself or claim capabilities you do not have.',
       },
       { role: 'user', content: 'What can you do?' },
     ],

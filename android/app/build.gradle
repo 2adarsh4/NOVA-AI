@@ -1,0 +1,13 @@
+plugins { id 'com.android.application' }
+
+android {
+  namespace 'ai.jarvis.nova'
+  compileSdk 35
+  defaultConfig { applicationId 'ai.jarvis.nova'; minSdk 23; targetSdk 35; versionCode 1; versionName '1.0.0' }
+}
+
+dependencies {
+  // Capacitor CLI adds this project when `npm run android:sync` is run.
+  implementation project(':capacitor-android')
+  implementation 'androidx.core:core:1.15.0'
+}

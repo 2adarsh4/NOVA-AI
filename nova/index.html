@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>NOVA AI</title>
+<title>JARVIS AI</title>
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#080b12;color:#fff;height:100vh}
@@ -13,7 +13,7 @@ header{padding:22px;text-align:center;border-bottom:1px solid #252b38}
 .sub{color:#8d96a8;margin-top:5px}
 .chat{flex:1;padding:20px;overflow:auto}
 .message{padding:14px 16px;border-radius:16px;margin-bottom:14px;max-width:85%;line-height:1.5}
-.nova{background:#151b27;border:1px solid #293142}
+.jarvis{background:#151b27;border:1px solid #293142}
 .user{background:#243047;margin-left:auto}
 .bottom{padding:15px;border-top:1px solid #252b38}
 input{width:100%;padding:16px;border-radius:14px;border:1px solid #343d4d;background:#111722;color:white;font-size:16px}
@@ -26,20 +26,21 @@ input:disabled,button:disabled{opacity:.6;cursor:wait}
 <body>
 <div class="app">
 <header>
-<div class="logo">NOVA</div>
+<div class="logo">JARVIS</div>
 <div class="sub">Your Personal AI Assistant</div>
 </header>
 
 <main class="chat" id="chat" aria-live="polite" aria-label="Conversation">
-<div class="message nova">Hello! I'm NOVA. 👋<br>I'm ready to become your personal AI assistant.</div>
+<div class="message jarvis">Hello! I'm JARVIS. 👋<br>I'm ready to be your personal AI assistant.</div>
 </main>
 
 <form class="bottom" id="chat-form">
-<input id="input" placeholder="Ask NOVA anything..." autocomplete="off" aria-label="Message NOVA">
+<input id="input" placeholder="Ask JARVIS anything..." autocomplete="off" aria-label="Message JARVIS">
 <div class="buttons">
 <button type="submit">Send</button>
 <button type="button" id="voice-button">🎤 Speak</button>
 <button type="button" id="repeat-button">🔊 Repeat</button>
+<button type="button" id="wake-word-button">✨ Hello JARVIS</button>
 </div>
 </form>
 </div>

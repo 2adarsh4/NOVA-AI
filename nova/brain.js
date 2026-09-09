@@ -5,7 +5,7 @@
 const MODEL_ID = 'onnx-community/SmolLM2-135M-Instruct-ONNX';
 const TRANSFORMERS_URL = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0';
 const SYSTEM_PROMPT = [
-  'You are NOVA, a helpful, concise personal AI assistant.',
+  'You are JARVIS, a helpful, concise personal AI assistant.',
   'Answer the user directly and accurately in one short sentence or phrase, then stop.',
   'For arithmetic, return the exact result and nothing else.',
   'Do not repeat yourself or claim capabilities you do not have.',
@@ -120,7 +120,7 @@ export async function generateNOVAResponse(message, {
     return_full_text: false,
   });
   const reply = responseText(result);
-  if (!reply) throw new Error('The NOVA model returned an empty response.');
+  if (!reply) throw new Error('The JARVIS model returned an empty response.');
   return reply;
 }
 
