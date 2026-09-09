@@ -31,16 +31,20 @@ test('NOVA connects to the local SmolLM2 ONNX model through Transformers.js', ()
   assert.match(brain, /pipeline\('text-generation', MODEL_ID/);
 });
 
-test('the brain initializes Transformers.js once and returns its generated answer', async () => {
+test('the brain applies SmolLM2 chat decoding controls and returns its generated answer', async () => {
   resetNOVAForTests();
   const environment = {};
   const pipelineCalls = [];
+  const generationCalls = [];
   const answer = await generateNOVAResponse('What can you do?', {
     loadTransformers: async () => ({
       env: environment,
       pipeline: async (...args) => {
         pipelineCalls.push(args);
-        return async (messages) => [{ generated_text: `${messages.at(-1).content} — I can help.` }];
+        return async (...args) => {
+          generationCalls.push(args);
+          return [{ generated_text: `${args[0].at(-1).content} — I can help.` }];
+        };
       },
     }),
   });
@@ -53,6 +57,25 @@ test('the brain initializes Transformers.js once and returns its generated answe
   ]);
   assert.equal(environment.allowLocalModels, false);
   assert.equal(environment.allowRemoteModels, true);
+  assert.deepEqual(generationCalls, [[
+    [
+      {
+        role: 'system',
+        content: 'You are NOVA, a helpful, concise personal AI assistant. Answer the user directly and accurately, then stop. Do not repeat yourself or claim capabilities you do not have.',
+      },
+      { role: 'user', content: 'What can you do?' },
+    ],
+    {
+      add_generation_prompt: true,
+      max_new_tokens: 64,
+      do_sample: false,
+      repetition_penalty: 1.15,
+      no_repeat_ngram_size: 3,
+      eos_token_id: 2,
+      pad_token_id: 2,
+      return_full_text: false,
+    },
+  ]]);
   resetNOVAForTests();
 });
 
