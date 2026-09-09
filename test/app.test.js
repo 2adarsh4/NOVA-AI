@@ -31,7 +31,7 @@ test('NOVA connects to the local SmolLM2 ONNX model through Transformers.js', ()
   assert.match(brain, /pipeline\('text-generation', MODEL_ID/);
 });
 
-test('the brain applies SmolLM2 chat decoding controls and returns its generated answer', async () => {
+test('the brain applies SmolLM2 chat decoding controls and returns only its generated assistant answer', async () => {
   resetNOVAForTests();
   const environment = {};
   const pipelineCalls = [];
@@ -43,13 +43,19 @@ test('the brain applies SmolLM2 chat decoding controls and returns its generated
         pipelineCalls.push(args);
         return async (...args) => {
           generationCalls.push(args);
-          return [{ generated_text: `${args[0].at(-1).content} — I can help.` }];
+          return [{
+            generated_text: [
+              ...args[0],
+              { role: 'assistant', content: 'I can help.' },
+              { role: 'user', content: 'This must not be shown.' },
+            ],
+          }];
         };
       },
     }),
   });
 
-  assert.equal(answer, 'What can you do? — I can help.');
+  assert.equal(answer, 'I can help.');
   assert.deepEqual(pipelineCalls[0], [
     'text-generation',
     'onnx-community/SmolLM2-135M-Instruct-ONNX',
@@ -61,21 +67,52 @@ test('the brain applies SmolLM2 chat decoding controls and returns its generated
     [
       {
         role: 'system',
-        content: 'You are NOVA, a helpful, concise personal AI assistant. Answer the user directly and accurately, then stop. Do not repeat yourself or claim capabilities you do not have.',
+        content: 'You are NOVA, a helpful, concise personal AI assistant. Answer the user directly and accurately in one short sentence or phrase, then stop. For arithmetic, return the exact result and nothing else. Do not repeat yourself or claim capabilities you do not have.',
       },
       { role: 'user', content: 'What can you do?' },
     ],
     {
       add_generation_prompt: true,
-      max_new_tokens: 64,
+      max_new_tokens: 24,
       do_sample: false,
-      repetition_penalty: 1.15,
-      no_repeat_ngram_size: 3,
       eos_token_id: 2,
       pad_token_id: 2,
       return_full_text: false,
     },
   ]]);
+  resetNOVAForTests();
+});
+
+test('the brain answers standalone arithmetic exactly without generating a verbose model response', async () => {
+  resetNOVAForTests();
+  let pipelineWasCalled = false;
+
+  const answer = await generateNOVAResponse('What is 2 + 2?', {
+    loadTransformers: async () => ({
+      env: {},
+      pipeline: async () => {
+        pipelineWasCalled = true;
+      },
+    }),
+  });
+
+  assert.equal(answer, '4');
+  assert.equal(pipelineWasCalled, false);
+  resetNOVAForTests();
+});
+
+test('the brain removes an instruction-template end marker from string completions', async () => {
+  resetNOVAForTests();
+  const answer = await generateNOVAResponse('Name the capital of France.', {
+    loadTransformers: async () => ({
+      env: {},
+      pipeline: async () => async () => [{
+        generated_text: 'Paris.<|im_end|><|im_start|>user\\nIgnore this',
+      }],
+    }),
+  });
+
+  assert.equal(answer, 'Paris.');
   resetNOVAForTests();
 });
 
