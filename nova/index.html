@@ -29,46 +29,90 @@ button:hover{background:#303b50}
 <div class="sub">Your Personal AI Assistant</div>
 </header>
 
-<div class="chat" id="chat">
+<main class="chat" id="chat" aria-live="polite" aria-label="Conversation">
 <div class="message nova">Hello! I'm NOVA. 👋<br>I'm ready to become your personal AI assistant.</div>
-</div>
+</main>
 
-<div class="bottom">
-<input id="input" placeholder="Ask NOVA anything..." onkeydown="if(event.key==='Enter')send()">
+<form class="bottom" id="chat-form">
+<input id="input" placeholder="Ask NOVA anything..." autocomplete="off" aria-label="Message NOVA">
 <div class="buttons">
-<button onclick="send()">Send</button>
-<button onclick="speak()">🎤 Voice</button>
+<button type="submit">Send</button>
+<button type="button" id="voice-button">🎤 Voice</button>
 </div>
-</div>
+</form>
 </div>
 
 <script>
-function appendMessage(type, text){
- const message=document.createElement('div');
- message.className=`message ${type}`;
- message.textContent=text;
- document.getElementById('chat').appendChild(message);
-}
+(() => {
+ 'use strict';
 
-function send(){
- const input=document.getElementById('input');
- const text=input.value.trim();
- if(!text)return;
- const chat=document.getElementById('chat');
- appendMessage('user',text);
- input.value='';
- setTimeout(()=>{
-  appendMessage('nova','I received your message. My AI brain will be connected next. 🧠');
-  chat.scrollTop=chat.scrollHeight;
- },400);
- chat.scrollTop=chat.scrollHeight;
-}
-function speak(){
- if('speechSynthesis' in window){
-  const u=new SpeechSynthesisUtterance("Hello, I am NOVA.");
-  speechSynthesis.speak(u);
+ const ready = () => {
+  const chat = document.getElementById('chat');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('input');
+  const voiceButton = document.getElementById('voice-button');
+
+  // Avoid throwing during startup if the page markup is changed or incomplete.
+  if (!chat || !form || !input || !voiceButton) return;
+
+  const scrollToLatest = () => {
+   chat.scrollTop = chat.scrollHeight;
+  };
+
+  const appendMessage = (type, text) => {
+   const message = document.createElement('div');
+   message.className = `message ${type}`;
+   // textContent intentionally keeps user-supplied content from becoming markup.
+   message.textContent = text;
+   chat.appendChild(message);
+   scrollToLatest();
+  };
+
+  const send = () => {
+   const text = input.value.trim();
+   if (!text) return;
+
+   appendMessage('user', text);
+   input.value = '';
+   input.focus();
+
+   window.setTimeout(() => {
+    appendMessage('nova', 'I received your message. My AI brain will be connected next. 🧠');
+   }, 400);
+  };
+
+  const speak = () => {
+   if (!('speechSynthesis' in window) || typeof window.SpeechSynthesisUtterance !== 'function') {
+    appendMessage('nova', 'Voice playback is not supported by this browser.');
+    return;
+   }
+
+   try {
+    window.speechSynthesis.cancel();
+    const utterance = new window.SpeechSynthesisUtterance('Hello, I am NOVA.');
+    utterance.onerror = () => {
+     appendMessage('nova', 'Voice playback is unavailable right now.');
+    };
+    window.speechSynthesis.speak(utterance);
+   } catch (error) {
+    console.warn('Unable to start voice playback.', error);
+    appendMessage('nova', 'Voice playback is unavailable right now.');
+   }
+  };
+
+  form.addEventListener('submit', (event) => {
+   event.preventDefault();
+   send();
+  });
+  voiceButton.addEventListener('click', speak);
+ };
+
+ if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', ready, { once: true });
+ } else {
+  ready();
  }
-}
+})();
 </script>
 </body>
 </html>
