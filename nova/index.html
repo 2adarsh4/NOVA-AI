@@ -43,15 +43,22 @@ button:hover{background:#303b50}
 </div>
 
 <script>
+function appendMessage(type, text){
+ const message=document.createElement('div');
+ message.className=`message ${type}`;
+ message.textContent=text;
+ document.getElementById('chat').appendChild(message);
+}
+
 function send(){
  const input=document.getElementById('input');
  const text=input.value.trim();
  if(!text)return;
  const chat=document.getElementById('chat');
- chat.innerHTML+=`<div class="message user">${text}</div>`;
+ appendMessage('user',text);
  input.value='';
  setTimeout(()=>{
-  chat.innerHTML+=`<div class="message nova">I received your message. My AI brain will be connected next. 🧠</div>`;
+  appendMessage('nova','I received your message. My AI brain will be connected next. 🧠');
   chat.scrollTop=chat.scrollHeight;
  },400);
  chat.scrollTop=chat.scrollHeight;
