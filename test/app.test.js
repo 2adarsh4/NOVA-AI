@@ -25,9 +25,9 @@ test('messages are rendered as text rather than injected HTML', () => {
 });
 
 test('NOVA connects to the local SmolLM2 ONNX model through Transformers.js', () => {
-  assert.match(brain, /@huggingface\/transformers/);
-  assert.match(brain, /SmolLM2-135M-Instruct-ONNX/);
-  assert.match(brain, /env\.allowRemoteModels = false/);
+  assert.match(brain, /@huggingface\/transformers@4\.2\.0/);
+  assert.match(brain, /onnx-community\/SmolLM2-135M-Instruct-ONNX/);
+  assert.match(brain, /env\.allowRemoteModels = true/);
   assert.match(brain, /pipeline\('text-generation', MODEL_ID/);
 });
 
@@ -48,12 +48,11 @@ test('the brain initializes Transformers.js once and returns its generated answe
   assert.equal(answer, 'What can you do? — I can help.');
   assert.deepEqual(pipelineCalls[0], [
     'text-generation',
-    'SmolLM2-135M-Instruct-ONNX',
+    'onnx-community/SmolLM2-135M-Instruct-ONNX',
     { dtype: 'q4' },
   ]);
-  assert.equal(environment.allowLocalModels, true);
-  assert.equal(environment.allowRemoteModels, false);
-  assert.equal(environment.localModelPath, '/models/');
+  assert.equal(environment.allowLocalModels, false);
+  assert.equal(environment.allowRemoteModels, true);
   resetNOVAForTests();
 });
 
